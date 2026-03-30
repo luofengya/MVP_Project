@@ -1,0 +1,664 @@
+version: "1.0"
+project: "siemens_v20_mvp"
+
+manifest_path: "D:/MVP_Project/config/docs_manifest.yaml"
+
+paths:
+  raw_text_dir: "D:/MVP_Project/workspace/raw_text"
+  clean_text_dir: "D:/MVP_Project/workspace/clean_text"
+  chunks_dir: "D:/MVP_Project/workspace/chunks"
+  chunks_file: "D:/MVP_Project/workspace/chunks/chunks.jsonl"
+  logs_dir: "D:/MVP_Project/workspace/logs"
+
+pipeline:
+  extract: true
+  clean: true
+  chunk: true
+  deduplicate: true
+  validate: true
+
+global:
+  language: "zh-CN"
+  keep_page_numbers: true
+  keep_section_headers: true
+  output_format: "jsonl"
+
+  citation:
+    keep_doc_title: true
+    keep_doc_id: true
+    keep_page_range: true
+    keep_section_h1: true
+    keep_section_h2: true
+    keep_section_h3: true
+
+  text_normalization:
+    unicode_normalize: "NFKC"
+    fullwidth_to_halfwidth: true
+    collapse_multiple_spaces: true
+    collapse_blank_lines: true
+    trim_line_edges: true
+    normalize_bullets: true
+    normalize_dashes: true
+    normalize_colons: true
+    normalize_parentheses: true
+
+  cleaning:
+    remove_page_headers: true
+    remove_page_footers: true
+    remove_repeated_titles: true
+    remove_page_numbers_if_isolated: false
+    remove_table_of_contents: true
+    remove_index_pages: false
+    remove_copyright_pages: true
+    remove_trademark_notices: true
+    remove_legal_disclaimer: true
+    remove_navigation_text: true
+    remove_related_links: true
+    remove_recommendation_modules: true
+    remove_cookie_banner_text: true
+
+  filters:
+    min_clean_text_chars_per_page: 30
+    min_chunk_chars: 120
+    max_chunk_chars_hard: 1500
+    skip_pages_matching:
+      - "法律声明"
+      - "责任免除"
+      - "商标"
+      - "版权"
+      - "目录"
+      - "安全说明"
+    skip_blocks_matching:
+      - "Technical Support"
+      - "www.siemens.com"
+      - "保留所有权利"
+      - "All rights reserved"
+
+  metadata:
+    required_fields:
+      - "device_family"
+      - "brand"
+      - "language"
+      - "doc_id"
+      - "doc_title"
+      - "doc_type"
+      - "doc_role"
+      - "source_kind"
+      - "chunk_id"
+      - "page_start"
+      - "page_end"
+    optional_fields:
+      - "section_h1"
+      - "section_h2"
+      - "section_h3"
+      - "keywords_zh"
+      - "retrieval_boost"
+      - "event_type"
+      - "event_code"
+      - "event_name_zh"
+      - "possible_causes"
+      - "recommended_actions"
+      - "param_id"
+      - "param_name_zh"
+      - "feature_group"
+      - "macro_type"
+      - "macro_id"
+      - "step_no"
+      - "protocol"
+      - "controller"
+      - "function_code"
+      - "comm_topic"
+
+extractors:
+  pdf:
+    engine: "pymupdf"
+    fallback_engine: "pypdf"
+    preserve_layout_lines: true
+    merge_wrapped_lines: true
+    detect_headings: true
+    detect_tables: false
+    page_separator: "\n\n===PAGE_BREAK===\n\n"
+
+  mhtml:
+    engine: "trafilatura"
+    fallback_engine: "beautifulsoup4"
+    extract_main_content_only: true
+    keep_lists: true
+    keep_tables_as_text: true
+    keep_links_text_only: true
+    strip_scripts: true
+    strip_styles: true
+    strip_nav: true
+    page_separator: "\n\n===BLOCK_BREAK===\n\n"
+
+heading_detection:
+  enabled: true
+  heading_patterns:
+    h1:
+      - "^第[一二三四五六七八九十0-9]+章"
+      - "^[0-9]+\\s+[\\u4e00-\\u9fa5A-Za-z].*"
+      - "^[一二三四五六七八九十]+、.*"
+    h2:
+      - "^[0-9]+\\.[0-9]+\\s+.*"
+      - "^\\([0-9]+\\)\\s+.*"
+      - "^[一二三四五六七八九十]+\\.[0-9]+\\s+.*"
+    h3:
+      - "^[0-9]+\\.[0-9]+\\.[0-9]+\\s+.*"
+
+field_extractors:
+  event_code:
+    patterns:
+      - "\\b([FA][0-9]{1,4})\\b"
+      - "故障\\s*([FA][0-9]{1,4})"
+      - "报警\\s*([FA][0-9]{1,4})"
+
+  param_id:
+    patterns:
+      - "\\b([Ppr][0-9]{4})\\b"
+      - "参数\\s*([Ppr][0-9]{4})"
+
+  macro_id:
+    patterns:
+      - "\\b(Cn[0-9]{3})\\b"
+      - "\\b(Ap[0-9]{3})\\b"
+
+  protocol:
+    patterns:
+      - "(Modbus RTU)"
+      - "(MODBUS)"
+      - "(USS)"
+
+  controller:
+    patterns:
+      - "(S7-1200)"
+      - "(PLC)"
+
+  function_code:
+    patterns:
+      - "\\b(FC[0-9]{1,2})\\b"
+      - "功能码\\s*([0-9]{1,2})"
+
+  event_type_rules:
+    fault_prefix: "F"
+    alarm_prefix: "A"
+
+  feature_group_rules:
+    quick_commissioning:
+      - "快速调试"
+      - "调试"
+      - "commissioning"
+    motor_data:
+      - "电机参数"
+      - "额定电流"
+      - "额定电压"
+      - "额定功率"
+      - "额定频率"
+    communication:
+      - "Modbus"
+      - "USS"
+      - "寄存器"
+      - "通信"
+      - "通讯"
+    pid:
+      - "PID"
+    fault_alarm:
+      - "故障"
+      - "报警"
+
+keyword_enrichment:
+  enabled: true
+  max_keywords: 8
+  strategy: "rule_based"
+  dictionaries:
+    fault_terms:
+      - "过流"
+      - "过压"
+      - "欠压"
+      - "过温"
+      - "报警"
+      - "跳闸"
+      - "母线电压"
+      - "故障复位"
+    commissioning_terms:
+      - "快速调试"
+      - "连接宏"
+      - "应用宏"
+      - "电机参数"
+      - "BOP"
+    communication_terms:
+      - "Modbus"
+      - "USS"
+      - "寄存器"
+      - "起停控制"
+      - "读写参数"
+      - "功能码"
+
+deduplication:
+  enabled: true
+  method: "text_hash_then_similarity"
+  normalize_before_hash: true
+  hash_algorithm: "sha1"
+  similarity_metric: "cosine"
+  similarity_threshold: 0.96
+  prefer_rules:
+    - "higher_source_priority"
+    - "higher_retrieval_boost"
+    - "more_structured_metadata"
+    - "newer_manual_when_same_topic"
+
+validation:
+  enabled: true
+  fail_on_missing_required_metadata: false
+  warn_on_empty_text: true
+  warn_on_short_chunk_under_chars: 100
+  warn_on_long_chunk_over_chars: 1400
+  sample_check_count: 20
+
+chunkers:
+  manual_chunker:
+    description: "用于完整版和精简版手册，优先按章节切，再按语义段落合并。"
+    applies_to:
+      - "operating_manual"
+      - "compact_manual"
+
+    base:
+      target_chars: 700
+      min_chars: 220
+      max_chars: 1100
+      overlap_chars: 100
+      merge_short_chunks: true
+      split_priority:
+        - "headings"
+        - "table_like_blocks"
+        - "paragraphs"
+        - "sentences"
+
+    section_rules:
+      parameter_sections:
+        enabled: true
+        detect_patterns:
+          - "参数列表"
+          - "参数"
+          - "\\b[Ppr][0-9]{4}\\b"
+        strategy: "one_parameter_per_chunk"
+        target_chars: 260
+        overlap_chars: 0
+        extract_fields:
+          - "param_id"
+          - "param_name_zh"
+          - "feature_group"
+
+      fault_alarm_sections:
+        enabled: true
+        detect_patterns:
+          - "故障与报警"
+          - "故障和报警"
+          - "故障代码"
+          - "报警代码"
+          - "\\b[FA][0-9]{1,4}\\b"
+        strategy: "one_event_per_chunk"
+        target_chars: 320
+        overlap_chars: 0
+        extract_fields:
+          - "event_type"
+          - "event_code"
+          - "event_name_zh"
+          - "possible_causes"
+          - "recommended_actions"
+
+      communication_sections:
+        enabled: true
+        detect_patterns:
+          - "PLC"
+          - "Modbus"
+          - "USS"
+          - "通讯"
+          - "通信"
+          - "寄存器"
+        strategy: "topic_subsection_chunk"
+        target_chars: 600
+        overlap_chars: 60
+        extract_fields:
+          - "protocol"
+          - "controller"
+          - "function_code"
+          - "comm_topic"
+
+    metadata_profile: "manual"
+
+  step_chunker:
+    description: "用于入门指南，优先按步骤、连接宏、应用宏切分。"
+    applies_to:
+      - "getting_started"
+
+    base:
+      target_chars: 420
+      min_chars: 180
+      max_chars: 700
+      overlap_chars: 30
+      merge_short_chunks: false
+      split_priority:
+        - "workflow_headings"
+        - "numbered_steps"
+        - "macro_blocks"
+        - "paragraphs"
+
+    workflow_rules:
+      step_patterns:
+        - "^步骤\\s*[0-9]+"
+        - "^第\\s*[0-9]+\\s*步"
+        - "^[0-9]+\\."
+      macro_patterns:
+        - "\\bCn[0-9]{3}\\b"
+        - "\\bAp[0-9]{3}\\b"
+        - "连接宏"
+        - "应用宏"
+      commissioning_patterns:
+        - "恢复出厂设置"
+        - "设置电机数据"
+        - "设置连接宏"
+        - "设置应用宏"
+        - "设置常用参数"
+
+    extraction_rules:
+      keep_step_order: true
+      infer_step_no: true
+      infer_macro_type: true
+      infer_macro_id: true
+
+    metadata_profile: "commissioning"
+
+  code_chunker:
+    description: "用于故障/报警支持页，一条故障码或报警码一个 chunk。"
+    applies_to:
+      - "fault_page"
+
+    base:
+      target_chars: 260
+      min_chars: 80
+      max_chars: 520
+      overlap_chars: 0
+      merge_short_chunks: false
+      split_priority:
+        - "event_code_blocks"
+        - "list_items"
+        - "paragraphs"
+
+    code_rules:
+      event_code_patterns:
+        - "\\bF[0-9]{1,4}\\b"
+        - "\\bA[0-9]{1,4}\\b"
+      event_block_end_patterns:
+        - "(?=\\bF[0-9]{1,4}\\b)"
+        - "(?=\\bA[0-9]{1,4}\\b)"
+      extract_possible_causes: true
+      extract_recommended_actions: true
+      one_code_one_chunk: true
+
+    metadata_profile: "fault_alarm"
+
+  topic_chunker:
+    description: "用于通讯支持页，按通讯主题切块。"
+    applies_to:
+      - "comm_page"
+
+    base:
+      target_chars: 550
+      min_chars: 220
+      max_chars: 900
+      overlap_chars: 60
+      merge_short_chunks: true
+      split_priority:
+        - "topic_headings"
+        - "subtopics"
+        - "paragraphs"
+
+    topic_rules:
+      topic_keywords:
+        start_stop_control:
+          - "起停"
+          - "启停"
+          - "运行命令"
+          - "停止命令"
+        setpoint_control:
+          - "给定值"
+          - "频率给定"
+          - "速度设定"
+        parameter_read_write:
+          - "参数读写"
+          - "读取参数"
+          - "写入参数"
+          - "非周期性"
+          - "寄存器"
+        fault_reset:
+          - "故障复位"
+          - "报警复位"
+          - "复位"
+        diagnostics:
+          - "诊断"
+          - "错误处理"
+          - "通信故障"
+          - "异常"
+
+      extract_protocol: true
+      extract_controller: true
+      extract_function_code: true
+      infer_comm_topic: true
+
+    metadata_profile: "communication"
+
+  case_chunker:
+    description: "用于单专题案例页，按问题-原因-处理建议切块。"
+    applies_to:
+      - "case_page"
+
+    base:
+      target_chars: 420
+      min_chars: 180
+      max_chars: 700
+      overlap_chars: 40
+      merge_short_chunks: true
+      split_priority:
+        - "problem_solution_patterns"
+        - "headings"
+        - "paragraphs"
+
+    case_rules:
+      problem_patterns:
+        - "现象"
+        - "问题"
+        - "报警"
+        - "故障"
+      cause_patterns:
+        - "原因"
+        - "可能原因"
+      action_patterns:
+        - "处理"
+        - "建议"
+        - "解决"
+        - "措施"
+
+      extract_event_code: true
+      extract_possible_causes: true
+      extract_recommended_actions: true
+
+    metadata_profile: "case"
+
+metadata_profiles:
+  manual:
+    add_fields:
+      - "device_family"
+      - "brand"
+      - "language"
+      - "doc_id"
+      - "doc_title"
+      - "doc_type"
+      - "doc_role"
+      - "source_kind"
+      - "source_priority"
+      - "retrieval_boost"
+      - "section_h1"
+      - "section_h2"
+      - "section_h3"
+      - "page_start"
+      - "page_end"
+      - "keywords_zh"
+
+  commissioning:
+    add_fields:
+      - "device_family"
+      - "brand"
+      - "language"
+      - "doc_id"
+      - "doc_title"
+      - "doc_type"
+      - "doc_role"
+      - "source_kind"
+      - "source_priority"
+      - "retrieval_boost"
+      - "section_h1"
+      - "section_h2"
+      - "page_start"
+      - "page_end"
+      - "keywords_zh"
+      - "step_no"
+      - "macro_type"
+      - "macro_id"
+      - "param_id"
+      - "param_name_zh"
+
+  fault_alarm:
+    add_fields:
+      - "device_family"
+      - "brand"
+      - "language"
+      - "doc_id"
+      - "doc_title"
+      - "doc_type"
+      - "doc_role"
+      - "source_kind"
+      - "source_priority"
+      - "retrieval_boost"
+      - "section_h1"
+      - "section_h2"
+      - "page_start"
+      - "page_end"
+      - "keywords_zh"
+      - "event_type"
+      - "event_code"
+      - "event_name_zh"
+      - "possible_causes"
+      - "recommended_actions"
+
+  communication:
+    add_fields:
+      - "device_family"
+      - "brand"
+      - "language"
+      - "doc_id"
+      - "doc_title"
+      - "doc_type"
+      - "doc_role"
+      - "source_kind"
+      - "source_priority"
+      - "retrieval_boost"
+      - "section_h1"
+      - "section_h2"
+      - "page_start"
+      - "page_end"
+      - "keywords_zh"
+      - "protocol"
+      - "controller"
+      - "function_code"
+      - "comm_topic"
+      - "param_id"
+      - "param_name_zh"
+
+  case:
+    add_fields:
+      - "device_family"
+      - "brand"
+      - "language"
+      - "doc_id"
+      - "doc_title"
+      - "doc_type"
+      - "doc_role"
+      - "source_kind"
+      - "source_priority"
+      - "retrieval_boost"
+      - "section_h1"
+      - "section_h2"
+      - "page_start"
+      - "page_end"
+      - "keywords_zh"
+      - "event_type"
+      - "event_code"
+      - "event_name_zh"
+      - "possible_causes"
+      - "recommended_actions"
+
+doc_overrides:
+  v20_op_manual_zh_0522:
+    chunker: "manual_chunker"
+    preferred_sections:
+      - "与 PLC 通讯"
+      - "参数列表"
+      - "故障与报警"
+      - "技术数据"
+
+  v20_compact_manual_zh_0823:
+    chunker: "manual_chunker"
+    preferred_sections:
+      - "BOP"
+      - "快速调试"
+      - "参数列表"
+      - "故障和报警"
+
+  v20_getting_started_zh_0315:
+    chunker: "step_chunker"
+    preferred_sections:
+      - "上电及恢复出厂默认设置"
+      - "设置电机数据"
+      - "设置连接宏"
+      - "设置应用宏"
+      - "设置常用参数"
+      - "故障与报警"
+
+  v20_faults_alarms_zh:
+    chunker: "code_chunker"
+
+  v20_modbus_zh:
+    chunker: "topic_chunker"
+
+  v20_a0501_case_zh:
+    chunker: "case_chunker"
+
+naming:
+  chunk_id_template: "{doc_id}__p{page_start}_{local_index}"
+  raw_text_file_template: "{doc_id}.jsonl"
+  clean_text_file_template: "{doc_id}.jsonl"
+
+mvp_scope:
+  enabled_doc_types:
+    - "operating_manual"
+    - "compact_manual"
+    - "getting_started"
+    - "fault_page"
+    - "comm_page"
+    - "case_page"
+
+  priority_topics:
+    - "故障码解释"
+    - "报警码解释"
+    - "快速调试"
+    - "连接宏"
+    - "应用宏"
+    - "Modbus通讯"
+    - "参数读写"
+
+  defer_topics:
+    - "复杂表格抽取"
+    - "跨文档自动对齐"
+    - "英文补充库混合召回"
+    - "图片OCR"
+    - "高级重排序"

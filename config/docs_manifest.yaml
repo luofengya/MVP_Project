@@ -1,0 +1,181 @@
+version: "1.0"
+project: "siemens_v20_mvp"
+root_dir: "D:/MVP_Project"
+
+documents:
+  - doc_id: "v20_op_manual_zh_0522"
+    path: "D:/MVP_Project/data/sinamics_v20/zh_primary/manuals/V20_op_instr_0522_zh-CHS.pdf"
+    relative_path: "data/sinamics_v20/zh_primary/manuals/V20_op_instr_0522_zh-CHS.pdf"
+    file_name: "V20_op_instr_0522_zh-CHS.pdf"
+    source_kind: "pdf"
+    device_family: "SINAMICS V20"
+    brand: "Siemens"
+    language: "zh-CN"
+    doc_title: "SINAMICS V20 变频器 操作说明"
+    doc_type: "operating_manual"
+    doc_role: "authoritative"
+    source_priority: "P0"
+    retrieval_boost: 1.20
+    status: "active"
+    tags:
+      - "操作说明"
+      - "完整版手册"
+      - "安装"
+      - "调试"
+      - "参数"
+      - "故障与报警"
+      - "PLC通讯"
+    notes: "中文主权威文档，优先作为参数定义、安装调试、故障报警和PLC通讯的基础来源。"
+
+  - doc_id: "v20_compact_manual_zh_0823"
+    path: "D:/MVP_Project/data/sinamics_v20/zh_primary/manuals/V20_cmpct_op_instr_0823_zh-CHS.pdf"
+    relative_path: "data/sinamics_v20/zh_primary/manuals/V20_cmpct_op_instr_0823_zh-CHS.pdf"
+    file_name: "V20_cmpct_op_instr_0823_zh-CHS.pdf"
+    source_kind: "pdf"
+    device_family: "SINAMICS V20"
+    brand: "Siemens"
+    language: "zh-CN"
+    doc_title: "SINAMICS V20 变频器 精简版操作说明"
+    doc_type: "compact_manual"
+    doc_role: "quick_lookup"
+    source_priority: "P0"
+    retrieval_boost: 1.15
+    status: "active"
+    tags:
+      - "精简版手册"
+      - "快查"
+      - "BOP"
+      - "快速调试"
+      - "参数列表"
+      - "故障和报警"
+    notes: "适合作为高频问答和快查来源，优先用于故障码、快速调试、BOP操作类问题。"
+
+  - doc_id: "v20_getting_started_zh_0315"
+    path: "D:/MVP_Project/data/sinamics_v20/zh_primary/manuals/SINAMICS_V20_Getting_Started_032015_zh-CHS.pdf"
+    relative_path: "data/sinamics_v20/zh_primary/manuals/SINAMICS_V20_Getting_Started_032015_zh-CHS.pdf"
+    file_name: "SINAMICS_V20_Getting_Started_032015_zh-CHS.pdf"
+    source_kind: "pdf"
+    device_family: "SINAMICS V20"
+    brand: "Siemens"
+    language: "zh-CN"
+    doc_title: "SINAMICS V20 入门指南"
+    doc_type: "getting_started"
+    doc_role: "commissioning"
+    source_priority: "P0"
+    retrieval_boost: 1.10
+    status: "active"
+    tags:
+      - "入门指南"
+      - "快速调试"
+      - "连接宏"
+      - "应用宏"
+      - "常用参数"
+      - "故障与报警"
+    notes: "适合作为流程型资料，优先用于快速调试、连接宏、应用宏、设置步骤类问题。"
+
+  - doc_id: "v20_faults_alarms_zh"
+    path: "D:/MVP_Project/data/sinamics_v20/zh_primary/support_pages/faults_alarms_v20_zh.mhtml"
+    relative_path: "data/sinamics_v20/zh_primary/support_pages/faults_alarms_v20_zh.mhtml"
+    file_name: "faults_alarms_v20_zh.mhtml"
+    source_kind: "mhtml"
+    device_family: "SINAMICS V20"
+    brand: "Siemens"
+    language: "zh-CN"
+    doc_title: "SINAMICS V20 故障与报警代码"
+    doc_type: "fault_page"
+    doc_role: "troubleshooting"
+    source_priority: "P0"
+    retrieval_boost: 1.30
+    status: "active"
+    tags:
+      - "支持页"
+      - "故障代码"
+      - "报警代码"
+      - "排障"
+      - "F代码"
+      - "A代码"
+    notes: "故障码和报警码主索引来源，后续建议按一条代码一个chunk进行切分。"
+
+  - doc_id: "v20_modbus_zh"
+    path: "D:/MVP_Project/data/sinamics_v20/zh_primary/support_pages/modbus_v20_zh.mhtml"
+    relative_path: "data/sinamics_v20/zh_primary/support_pages/modbus_v20_zh.mhtml"
+    file_name: "modbus_v20_zh.mhtml"
+    source_kind: "mhtml"
+    device_family: "SINAMICS V20"
+    brand: "Siemens"
+    language: "zh-CN"
+    doc_title: "SINAMICS V20 MODBUS 通讯"
+    doc_type: "comm_page"
+    doc_role: "communication"
+    source_priority: "P0"
+    retrieval_boost: 1.12
+    status: "active"
+    tags:
+      - "支持页"
+      - "Modbus"
+      - "通讯"
+      - "参数读写"
+      - "寄存器"
+      - "功能码"
+    notes: "优先用于Modbus通讯、参数读写、寄存器访问类问题。"
+
+  - doc_id: "v20_a0501_case_zh"
+    path: "D:/MVP_Project/data/sinamics_v20/zh_primary/cases/a0501_alarm_case_zh.mhtml"
+    relative_path: "data/sinamics_v20/zh_primary/cases/a0501_alarm_case_zh.mhtml"
+    file_name: "a0501_alarm_case_zh.mhtml"
+    source_kind: "mhtml"
+    device_family: "SINAMICS V20"
+    brand: "Siemens"
+    language: "zh-CN"
+    doc_title: "V20 A0501 报警处理案例"
+    doc_type: "case_page"
+    doc_role: "case"
+    source_priority: "P1"
+    retrieval_boost: 1.05
+    status: "active"
+    tags:
+      - "案例"
+      - "A0501"
+      - "报警处理"
+      - "故障排查"
+    notes: "单专题案例资料，适合作为后续诊断助手的案例补充源。"
+
+default_processing:
+  language: "zh-CN"
+  embedding_language_hint: "chinese"
+  chunk_language: "zh-CN"
+  keep_page_numbers: true
+  keep_section_headers: true
+  remove_boilerplate: true
+  dedup_strategy: "prefer_higher_priority"
+
+doc_type_rules:
+  operating_manual:
+    chunk_strategy: "manual_chunker"
+    metadata_profile: "manual"
+    canonical_priority: 1
+
+  compact_manual:
+    chunk_strategy: "manual_chunker"
+    metadata_profile: "manual"
+    canonical_priority: 2
+
+  getting_started:
+    chunk_strategy: "step_chunker"
+    metadata_profile: "commissioning"
+    canonical_priority: 1
+
+  fault_page:
+    chunk_strategy: "code_chunker"
+    metadata_profile: "fault_alarm"
+    canonical_priority: 1
+
+  comm_page:
+    chunk_strategy: "topic_chunker"
+    metadata_profile: "communication"
+    canonical_priority: 1
+
+  case_page:
+    chunk_strategy: "case_chunker"
+    metadata_profile: "case"
+    canonical_priority: 1

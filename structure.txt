@@ -1,0 +1,16 @@
+src/
+    core/
+        config_loader.py
+        models.py
+        utils.py
+    ingest/
+        extract_pdf.py
+        extract_mhtml.py
+        cleaner.py
+        heading_parser.py
+        field_extractors.py
+        chunker.py
+        deduplicator.py
+        validator.py
+    pipeline/
+        build_chunks.py
